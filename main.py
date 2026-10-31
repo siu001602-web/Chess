@@ -4,7 +4,7 @@ from streamlit_chess import chess_board
 
 # 페이지 설정
 st.set_page_config(
-    page_title="Streamlit 체스 게임 (드래그 앤 드롭)",
+    page_title="Streamlit 체스 게임",
     page_icon="♟️",
     layout="centered"
 )
@@ -12,11 +12,10 @@ st.set_page_config(
 st.title("♟️ Streamlit 체스 게임")
 st.write("마우스로 말을 드래그해서 놓으면 한 턴씩 자동으로 전환됩니다.")
 
-# 1. 게임 상태 초기화
+# 게임 상태 초기화
 if "board" not in st.session_state:
     st.session_state.board = chess.Board()
 
-# 2. 게임 리셋 함수
 def reset_game():
     st.session_state.board = chess.Board()
 
@@ -39,26 +38,24 @@ elif st.session_state.board.is_insufficient_material():
 elif st.session_state.board.is_check():
     st.warning("⚠️ 체크 상태입니다!")
 
-# 3. 드래그 앤 드롭 체스판 렌더링
-# FEN(체스판의 현재 배치 상태 문자열)을 넘겨주어 상태를 유지합니다.
+# 드래그 앤 드롭 체스판 렌더링
 move_dict = chess_board(
     fen=st.session_state.board.fen(),
     key="interactive_chess_board"
 )
 
-# 4. 마우스 드래그로 수가 감지되었을 때 처리
+# 마우스 드래그로 수가 감지되었을 때 처리
 if move_dict and move_dict.get("move"):
     move_uci = move_dict["move"]
     try:
         move = chess.Move.from_uci(move_uci)
-        # 규칙에 맞는 수인 경우 board 상태 업데이트
         if move in st.session_state.board.legal_moves:
             st.session_state.board.push(move)
             st.rerun()
     except ValueError:
         pass
 
-# 5. 둘 수 있는 수 목록 (도움말)
+# 둘 수 있는 수 목록 (도움말)
 with st.expander("현재 둘 수 있는 모든 규칙적인 수 (Legal Moves)"):
     legal_moves = [m.uci() for m in st.session_state.board.legal_moves]
     st.write(", ".join(legal_moves))
